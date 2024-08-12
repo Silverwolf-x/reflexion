@@ -198,11 +198,18 @@ class ReactAgent:
         self.scratchpad += f'\nAction {self.step_n}:'
         action = self.prompt_agent()
         self.scratchpad += ' ' + action
-        action_type, argument = parse_action(action)
         print(self.scratchpad.split('\n')[-1])
 
         # Observe
         self.scratchpad += f'\nObservation {self.step_n}: '
+
+        if parse_action(action) is not None:
+            action_type, argument = parse_action(action)
+        else:
+            self.scratchpad += 'Invalid Action. Valid Actions are Lookup[<topic>] Search[<topic>] and Finish[<answer>].'
+            print(self.scratchpad.split('\n')[-1])
+            self.step_n += 1
+            return
         
         if action_type == 'Finish':
             self.answer = argument
@@ -388,6 +395,5 @@ def normalize_answer(s):
 
 def EM(answer, key) -> bool:
     return normalize_answer(answer) == normalize_answer(key)
-
 
 
