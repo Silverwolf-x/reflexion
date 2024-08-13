@@ -22,6 +22,7 @@ class AnyOpenAILLM:
 ```
 注：这个版本的langchain文档很老，在[langchain0.0.162](https://langchain-fanyi.readthedocs.io/en/latest/modules/models/chat/integrations/openai.html)
 实际上，langchain最新版v0.2需要更新的改动来插入apikey和url
+3. 运行ReactQA.py，根据需要选择要测试的data数量
 
 ## hotpotqa_runs复现问题
 在20240813，[Issue#43](https://github.com/noahshinn/reflexion/issues/43)提到hotpotqa重现结果很差，并且修改了agents.py报错。（本人复现时也报错了）具体报错为
@@ -30,3 +31,5 @@ class AnyOpenAILLM:
     action_type, argument = parse_action(action)
 TypeError: cannot unpack non-iterable NoneType object
 ```
+
+结束时有TypeError: cannot pickle 'builtins.CoreBPE' object
