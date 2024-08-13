@@ -25,7 +25,7 @@ agents = [agent_cls(row['question'], row['answer'])]
 # agents = [agent_cls(row['question'], row['answer']) for _, row in hotpot.iterrows()]
 
 # Run `n` trials
-n = 5
+n = 1
 trial = 0
 log = ''
 

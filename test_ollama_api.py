@@ -21,13 +21,3 @@ messages = [
 print(
 chat(messages)
 )
-# OpenAI()
- 
-# response = client.chat.completions.create(
-#   model="qwen2:1.5b",
-#   messages=[
-#     {"role": "system", "content": "You are a helpful assistant."},
-#     {"role": "user", "content": "你是谁"},
-#     {"role": "user", "content": "今天是星期几?"}
-#   ]
-# )
