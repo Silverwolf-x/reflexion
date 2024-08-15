@@ -43,9 +43,10 @@ for i in range(n):
 
 # #### Save the result log
 
-
-with open(os.path.join(root, 'ReAct', strategy.value, f'{len(agents)}_questions_{trial}_trials.txt'), 'w') as f:
+import time
+formatted_time = time.strftime("%m%d_%H%M", time.localtime())
+with open(os.path.join(root, 'ReAct', strategy.value, f'{len(agents)}_questions_{trial}_trials_{formatted_time}.txt'), 'w') as f:
     f.write(log)
-save_agents(agents, os.path.join('ReAct', strategy.value, 'agents'))
+# save_agents(agents, os.path.join('ReAct', strategy.value, 'agents'))
 
 

@@ -13,7 +13,7 @@ from langchain.schema import (
 import os
 os.environ['OPENAI_API_BASE'] = 'http://localhost:11434/v1'
 os.environ['OPENAI_API_KEY'] = 'MEDAI'
-chat = ChatOpenAI(temperature=0,model_name='llama3:8b')
+chat = ChatOpenAI(temperature=0,model_name='qwen2')
 messages = [
     SystemMessage(content="You are a helpful assistant that translates English to French."),
     HumanMessage(content="Translate this sentence from English to French. I love programming.")
