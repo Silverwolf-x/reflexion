@@ -8,7 +8,7 @@ conda create -n reflexion python=3.10
 conda activate reflexion
 pip install -r requirements.txt
 ```
-2. 【代码已改】在`llm.py`下，设置openai_api_base和apikey。注意要输入准确的ollama模型名称才能调用
+2. 【代码已改】在`llm.py`下，设置openai_api_base和apikey。注意要输入准确的ollama模型名称才能调用对应的模型进行测试。
 ```python
 import os
 os.environ['OPENAI_API_BASE'] = 'http://localhost:11434/v1'
@@ -31,5 +31,6 @@ class AnyOpenAILLM:
     action_type, argument = parse_action(action)
 TypeError: cannot unpack non-iterable NoneType object
 ```
+同样应用于COT
 
-结束时有TypeError: cannot pickle 'builtins.CoreBPE' object
+结束时有TypeError: cannot pickle 'builtins.CoreBPE' object。如果list包裹住agents时。
