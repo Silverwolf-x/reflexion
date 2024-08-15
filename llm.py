@@ -11,7 +11,7 @@ class AnyOpenAILLM:
     def __init__(self, *args, **kwargs):
         # Determine model type from the kwargs
         # model_name = kwargs.get('model_name', 'gpt-3.5-turbo') 
-        kwargs['model_name'] = 'qwen2'
+        kwargs['model_name'] = 'llama3'
         if kwargs['model_name'].split('-')[0] == 'text':
             self.model = OpenAI(*args, **kwargs)
             self.model_type = 'completion'

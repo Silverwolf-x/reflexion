@@ -1,21 +1,17 @@
 
 # Notebook for running Chain-of-Thought with supporting context experiments 
 
-# %%
 import sys, os
 sys.path.append('..')
 root = '../root/'
 
-# %%
 import joblib
 import numpy as np
 from agents import CoTAgent, ReflexionStrategy
 from util import summarize_trial, log_trial, save_agents
 
-# %% [markdown]
 # #### Load the HotPotQA Sample
 
-# %%
 hotpot = joblib.load('../data/hotpot-qa-distractor-sample.joblib').reset_index(drop = True)
 
 hotpot['supporting_paragraphs'] = None
@@ -30,21 +26,22 @@ for ind, row in hotpot.iterrows():
     supporting_paragraphs = '\n\n'.join(supporting_paragraphs)
     hotpot.at[ind, 'supporting_paragraphs'] = supporting_paragraphs
 
-# %% [markdown]
 # #### Define the Reflexion Strategy
 
-# %%
+
 print(ReflexionStrategy.__doc__)
 
-# %%
-strategy: ReflexionStrategy = ReflexionStrategy.REFLEXION
 
-# %% [markdown]
+# strategy: ReflexionStrategy = ReflexionStrategy.REFLEXION
+strategy: ReflexionStrategy = ReflexionStrategy.LAST_ATTEMPT_AND_REFLEXION
+
 # #### Initialize a CoTAgent for each question
 
-# %%
 from prompts import cot_agent_prompt, cot_reflect_agent_prompt, cot_reflect_prompt
 from fewshots import COT, COT_REFLECT
+# 运行2例
+hotpot = hotpot.iloc[0:1]
+
 agents = [CoTAgent(row['question'],
                    row['supporting_paragraphs'],
                    row['answer'],
@@ -54,17 +51,15 @@ agents = [CoTAgent(row['question'],
                    reflect_examples=COT_REFLECT,
                     ) for _, row in hotpot.iterrows()]
 
-# %% [markdown]
 # #### Run `n` trials
 
-# %%
 n = 5
 trial = 0
 log = ''
 
-# %%
 for i in range(n):
     for agent in [a for a in agents if not a.is_correct()]:
+        print(f'Question: {agent.question}')
         agent.run(reflexion_strategy = strategy)
         print(f'Answer: {agent.key}')
     trial += 1
@@ -72,11 +67,9 @@ for i in range(n):
     correct, incorrect = summarize_trial(agents)
     print(f'Finished Trial {trial}, Correct: {len(correct)}, Incorrect: {len(incorrect)}')
 
-# %% [markdown]
-# #### Save the result log
-
-# %%
-with open(os.path.join(root, 'CoT', 'context', strategy.value, f'{len(agents)}_questions_{trial}_trials.txt'), 'w') as f:
+import time
+formatted_time = time.strftime("%m%d_%H%M", time.localtime())
+with open(os.path.join(root, 'CoT', 'context', strategy.value, f'{formatted_time}_{len(agents)}_questions_{trial}_trials.txt'), 'w') as f:
     f.write(log)
 save_agents(agents, os.path.join(root, 'CoT', 'context', strategy.value, 'agents'))
 
