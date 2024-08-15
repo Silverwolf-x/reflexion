@@ -88,7 +88,14 @@ class CoTAgent:
         self.scratchpad += f'\nAction:'
         action = self.prompt_agent()
         self.scratchpad += ' ' + action
-        action_type, argument = parse_action(action)
+        if parse_action(action) is not None:
+            action_type, argument = parse_action(action)
+        else:
+            self.scratchpad += 'Invalid Action. Valid Actions are Lookup[<topic>] Search[<topic>] and Finish[<answer>].'
+            print(self.scratchpad.split('\n')[-1])
+            self.step_n += 1
+            return
+        # action_type, argument = parse_action(action)
         print(self.scratchpad.split('\n')[-1])  
 
         self.scratchpad += f'\nObservation: '
