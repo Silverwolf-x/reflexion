@@ -108,6 +108,7 @@ class CoTAgent:
             self.finished = True
             return
         else:
+            self.scratchpad += 'Invalid Action. Valid Actions are Lookup[<topic>] Search[<topic>] and Finish[<answer>].'
             print('Invalid action type, please try again.')
     
     def reflect(self,

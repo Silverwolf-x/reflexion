@@ -1,0 +1,45 @@
+
+########################################
+BEGIN TRIAL 1
+Trial summary: Correct: 0, Incorrect: 0
+#######################################
+------------- BEGIN CORRECT AGENTS -------------
+
+------------- BEGIN INCORRECT AGENTS -----------
+
+
+########################################
+BEGIN TRIAL 2
+Trial summary: Correct: 0, Incorrect: 0
+#######################################
+------------- BEGIN CORRECT AGENTS -------------
+
+------------- BEGIN INCORRECT AGENTS -----------
+
+
+########################################
+BEGIN TRIAL 3
+Trial summary: Correct: 0, Incorrect: 0
+#######################################
+------------- BEGIN CORRECT AGENTS -------------
+
+------------- BEGIN INCORRECT AGENTS -----------
+
+
+########################################
+BEGIN TRIAL 4
+Trial summary: Correct: 0, Incorrect: 0
+#######################################
+------------- BEGIN CORRECT AGENTS -------------
+
+------------- BEGIN INCORRECT AGENTS -----------
+
+
+########################################
+BEGIN TRIAL 5
+Trial summary: Correct: 0, Incorrect: 0
+#######################################
+------------- BEGIN CORRECT AGENTS -------------
+
+------------- BEGIN INCORRECT AGENTS -----------
+
