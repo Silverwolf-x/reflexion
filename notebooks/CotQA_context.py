@@ -32,14 +32,14 @@ for ind, row in hotpot.iterrows():
 print(ReflexionStrategy.__doc__)
 
 
-# strategy: ReflexionStrategy = ReflexionStrategy.REFLEXION
-strategy: ReflexionStrategy = ReflexionStrategy.LAST_ATTEMPT_AND_REFLEXION
+strategy: ReflexionStrategy = ReflexionStrategy.REFLEXION
+# strategy: ReflexionStrategy = ReflexionStrategy.LAST_ATTEMPT_AND_REFLEXION
 
 # #### Initialize a CoTAgent for each question
 
 from prompts import cot_agent_prompt, cot_reflect_agent_prompt, cot_reflect_prompt
 from fewshots import COT, COT_REFLECT
-# 运行2例
+# 运行1例
 hotpot = hotpot.iloc[0:1]
 
 agents = [CoTAgent(row['question'],
