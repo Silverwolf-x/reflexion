@@ -2,13 +2,22 @@ import os
 import joblib
 
 def summarize_trial(agents):
-    correct = [a for a in agents if a.is_correct()]
-    incorrect = [a for a in agents if a.is_finished() and not a.is_correct()]
+    ### 更改判断方式，让不是correct的统统判到incorrect，从而输出log
+    # correct = [a for a in agents if a.is_correct()]
+    # incorrect = [a for a in agents if a.is_finished() and not a.is_correct()]
+    correct,incorrect = [],[]
+    for a in agents:
+        if a.is_correct():
+            correct.append(a)
+        else:
+            incorrect.append(a)
+
     return correct, incorrect
 
 def remove_fewshot(prompt: str) -> str:
-    prefix = prompt.split('Here are some examples:')[0]
-    suffix = prompt.split('(END OF EXAMPLES)')[1]
+    # 中文化，对应的是promptsmed.py
+    prefix = prompt.split('下面是一些示例：')[0]
+    suffix = prompt.split('（示例结束）')[1]
     return prefix.strip('\n').strip() + '\n' +  suffix.strip('\n').strip()
 
 def log_trial(agents, trial_n):
