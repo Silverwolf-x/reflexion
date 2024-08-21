@@ -5,8 +5,7 @@ from langchain.schema import (
     HumanMessage,AIMessage,BaseMessage
 )
 import os
-import subprocess
-import json
+
 os.environ['OPENAI_API_BASE'] = 'http://localhost:11434/v1'
 os.environ['OPENAI_API_KEY'] = 'MEDAI'
 
@@ -23,13 +22,7 @@ class AnyOpenAILLM:
 
         # #### 展示正在使用的ollama模型信息
         # TODO: 不要在llm.py设定模型，这不优雅
-        try: 
-            command = ['curl', 'http://localhost:11434/api/ps']
-            result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-            json_data = json.loads(result.stdout)
-            print(f"Model: {json_data['models'][0]['name']}\tParameter: {json_data['models'][0]['details']['parameter_size']}")
-        except Exception as e:
-            print(e)
+
     
     def __call__(self, prompt: str):
         if self.model_type == 'completion':

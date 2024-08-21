@@ -31,7 +31,18 @@ class ReflexionStrategy(Enum):
     LAST_ATTEMPT = 'last_trial' 
     REFLEXION = 'reflexion'
     LAST_ATTEMPT_AND_REFLEXION = 'last_trial_and_reflexion'
-
+def get_model_name():
+    import subprocess,json
+    try: 
+        command = ['ollama', 'serve']
+        command = ['curl', 'http://localhost:11434/api/ps']
+        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        json_data = json.loads(result.stdout)
+        mn = f"Model: {json_data['models'][0]['name']}\tParameter: {json_data['models'][0]['details']['parameter_size']}"
+        print(mn)
+        return mn
+    except Exception as e:
+        print(e)
 
 class CoTAgent:
     def __init__(self,
@@ -44,14 +55,14 @@ class CoTAgent:
                     reflect_examples: str = COT_REFLECT,
                     self_reflect_llm: AnyOpenAILLM = AnyOpenAILLM(
                                             temperature=0,
-                                            # max_tokens=250,
-                                            model_name="gpt-3.5-turbo",
+                                            max_tokens=250000,
+                                            model_name="qwen2",
                                             model_kwargs={"stop": "\n"},
                                             openai_api_key=os.environ['OPENAI_API_KEY']),
                     action_llm: AnyOpenAILLM = AnyOpenAILLM(
                                             temperature=0,
-                                            # max_tokens=250,
-                                            model_name="gpt-3.5-turbo",
+                                            max_tokens=250000,
+                                            model_name="qwen2",
                                             model_kwargs={"stop": "\n"},
                                             openai_api_key=os.environ['OPENAI_API_KEY']),
                     ) -> None:
@@ -92,7 +103,7 @@ class CoTAgent:
             action_type, argument = parse_action(action)
         else:
             # 'Invalid Action. Valid Actions are Lookup[<topic>] Search[<topic>] and Finish[<answer>].'
-            self.scratchpad += '无效行动。有效行动只有完成[<答案>]、分析[<思考>]'
+            self.scratchpad += '无效行动！请按照"完成[<答案>]"的格式回答！'
             print(self.scratchpad.split('\n')[-1])
             self.step_n += 1
             return
@@ -100,17 +111,29 @@ class CoTAgent:
         print(self.scratchpad.split('\n')[-1])  
 
         self.scratchpad += f'\n观察: '
-        if action_type == '完成':
+        # if action_type == '完成':
+        #     self.answer = argument
+        #     if self.is_correct():
+        #         self.scratchpad += '回答正确'
+        #     else: 
+        #         self.scratchpad += '回答错误'
+        #     self.finished = True
+        #     return
+        # else:
+        #     self.scratchpad += '无效行动！请按照"完成[<答案>]"的格式回答！'
+        #     print('Invalid action type, please try again.')
+        try: 
             self.answer = argument
             if self.is_correct():
                 self.scratchpad += '回答正确'
             else: 
-                self.scratchpad += '回答错误'
+                self.scratchpad += '回答错误!请重新分析,并按照"完成[<答案>]"的格式回答！'
             self.finished = True
             return
-        else:
-            self.scratchpad += '无效行动。有效行动只有完成[<答案>]、分析[<思考>]'
-            print('Invalid action type, please try again.')
+        except Exception as e:
+            # self.scratchpad += '无效行动！请按照"完成[<答案>]"的格式回答！'
+            # print('Invalid action type, please try again.')
+            print(e)
     
     def reflect(self,
                 strategy: ReflexionStrategy) -> None:
@@ -161,189 +184,189 @@ class CoTAgent:
     def is_correct(self) -> bool:
         return EM(self.answer, self.key)   
 
-class ReactAgent:
-    def __init__(self,
-                 question: str,
-                 key: str,
-                 max_steps: int = 6,
-                 agent_prompt: PromptTemplate = react_agent_prompt,
-                 docstore: Docstore = Wikipedia(),
-                 react_llm: AnyOpenAILLM = AnyOpenAILLM(
-                                            temperature=0,
-                                            max_tokens=100,
-                                            model_name="gpt-3.5-turbo",
-                                            model_kwargs={"stop": "\n"},
-                                            openai_api_key=os.environ['OPENAI_API_KEY']),
-                 ) -> None:
+# class ReactAgent:
+#     def __init__(self,
+#                  question: str,
+#                  key: str,
+#                  max_steps: int = 6,
+#                  agent_prompt: PromptTemplate = react_agent_prompt,
+#                  docstore: Docstore = Wikipedia(),
+#                  react_llm: AnyOpenAILLM = AnyOpenAILLM(
+#                                             temperature=0,
+#                                             max_tokens=100,
+#                                             model_name="gpt-3.5-turbo",
+#                                             model_kwargs={"stop": "\n"},
+#                                             openai_api_key=os.environ['OPENAI_API_KEY']),
+#                  ) -> None:
         
-        self.question = question
-        self.answer = ''
-        self.key = key
-        self.max_steps = max_steps
-        self.agent_prompt = agent_prompt
-        self.react_examples = WEBTHINK_SIMPLE6
+#         self.question = question
+#         self.answer = ''
+#         self.key = key
+#         self.max_steps = max_steps
+#         self.agent_prompt = agent_prompt
+#         self.react_examples = WEBTHINK_SIMPLE6
 
-        self.docstore = DocstoreExplorer(docstore) # Search, Lookup
-        self.llm = react_llm
+#         self.docstore = DocstoreExplorer(docstore) # Search, Lookup
+#         self.llm = react_llm
         
-        self.enc = tiktoken.encoding_for_model("text-davinci-003")
+#         self.enc = tiktoken.encoding_for_model("text-davinci-003")
 
-        self.__reset_agent()
+#         self.__reset_agent()
 
-    def run(self, reset = True) -> None:
-        if reset:
-            self.__reset_agent()
+#     def run(self, reset = True) -> None:
+#         if reset:
+#             self.__reset_agent()
         
-        while not self.is_halted() and not self.is_finished():
-            self.step()
+#         while not self.is_halted() and not self.is_finished():
+#             self.step()
     
-    def step(self) -> None:
-        # Think
-        self.scratchpad += f'\nThought {self.step_n}:'
-        self.scratchpad += ' ' + self.prompt_agent()
-        print(self.scratchpad.split('\n')[-1])
+#     def step(self) -> None:
+#         # Think
+#         self.scratchpad += f'\nThought {self.step_n}:'
+#         self.scratchpad += ' ' + self.prompt_agent()
+#         print(self.scratchpad.split('\n')[-1])
 
-        # Act
-        self.scratchpad += f'\nAction {self.step_n}:'
-        action = self.prompt_agent()
-        self.scratchpad += ' ' + action
-        print(self.scratchpad.split('\n')[-1])
+#         # Act
+#         self.scratchpad += f'\nAction {self.step_n}:'
+#         action = self.prompt_agent()
+#         self.scratchpad += ' ' + action
+#         print(self.scratchpad.split('\n')[-1])
 
-        # Observe
-        self.scratchpad += f'\nObservation {self.step_n}: '
+#         # Observe
+#         self.scratchpad += f'\nObservation {self.step_n}: '
 
-        if parse_action(action) is not None:
-            action_type, argument = parse_action(action)
-        else:
-            self.scratchpad += 'Invalid Action. Valid Actions are Lookup[<topic>] Search[<topic>] and Finish[<answer>].'
-            print(self.scratchpad.split('\n')[-1])
-            self.step_n += 1
-            return
+#         if parse_action(action) is not None:
+#             action_type, argument = parse_action(action)
+#         else:
+#             self.scratchpad += 'Invalid Action. Valid Actions are Lookup[<topic>] Search[<topic>] and Finish[<answer>].'
+#             print(self.scratchpad.split('\n')[-1])
+#             self.step_n += 1
+#             return
         
-        if action_type == 'Finish':
-            self.answer = argument
-            if self.is_correct():
-                self.scratchpad += 'Answer is CORRECT'
-            else: 
-                self.scratchpad += 'Answer is INCORRECT'
-            self.finished = True
-            self.step_n += 1
-            return
+#         if action_type == 'Finish':
+#             self.answer = argument
+#             if self.is_correct():
+#                 self.scratchpad += 'Answer is CORRECT'
+#             else: 
+#                 self.scratchpad += 'Answer is INCORRECT'
+#             self.finished = True
+#             self.step_n += 1
+#             return
 
-        if action_type == 'Search':
-            try:
-                self.scratchpad += format_step(self.docstore.search(argument))
-            except Exception as e:
-                print(e)
-                self.scratchpad += f'Could not find that page, please try again.'
+#         if action_type == 'Search':
+#             try:
+#                 self.scratchpad += format_step(self.docstore.search(argument))
+#             except Exception as e:
+#                 print(e)
+#                 self.scratchpad += f'Could not find that page, please try again.'
             
-        elif action_type == 'Lookup':
-            try:
-                self.scratchpad += format_step(self.docstore.lookup(argument))
-            except ValueError:
-                self.scratchpad += f'The last page Searched was not found, so you cannot Lookup a keyword in it. Please try one of the similar pages given.'
+#         elif action_type == 'Lookup':
+#             try:
+#                 self.scratchpad += format_step(self.docstore.lookup(argument))
+#             except ValueError:
+#                 self.scratchpad += f'The last page Searched was not found, so you cannot Lookup a keyword in it. Please try one of the similar pages given.'
 
-        else:
-            self.scratchpad += 'Invalid Action. Valid Actions are Lookup[<topic>] Search[<topic>] and Finish[<answer>].'
+#         else:
+#             self.scratchpad += 'Invalid Action. Valid Actions are Lookup[<topic>] Search[<topic>] and Finish[<answer>].'
 
-        print(self.scratchpad.split('\n')[-1])
+#         print(self.scratchpad.split('\n')[-1])
 
-        self.step_n += 1
+#         self.step_n += 1
 
-    def prompt_agent(self) -> str:
-        return format_step(self.llm(self._build_agent_prompt()))
+#     def prompt_agent(self) -> str:
+#         return format_step(self.llm(self._build_agent_prompt()))
     
-    def _build_agent_prompt(self) -> str:
-        return self.agent_prompt.format(
-                            examples = self.react_examples,
-                            question = self.question,
-                            scratchpad = self.scratchpad)
+#     def _build_agent_prompt(self) -> str:
+#         return self.agent_prompt.format(
+#                             examples = self.react_examples,
+#                             question = self.question,
+#                             scratchpad = self.scratchpad)
     
-    def is_finished(self) -> bool:
-        return self.finished
+#     def is_finished(self) -> bool:
+#         return self.finished
 
-    def is_correct(self) -> bool:
-        return EM(self.answer, self.key)
+#     def is_correct(self) -> bool:
+#         return EM(self.answer, self.key)
 
-    def is_halted(self) -> bool:
-        return ((self.step_n > self.max_steps) or (len(self.enc.encode(self._build_agent_prompt())) > 3896)) and not self.finished
+#     def is_halted(self) -> bool:
+#         return ((self.step_n > self.max_steps) or (len(self.enc.encode(self._build_agent_prompt())) > 3896)) and not self.finished
 
-    def __reset_agent(self) -> None:
-        self.step_n = 1
-        self.finished = False
-        self.scratchpad: str = ''
+#     def __reset_agent(self) -> None:
+#         self.step_n = 1
+#         self.finished = False
+#         self.scratchpad: str = ''
 
-    def set_qa(self, question: str, key: str) -> None:
-        self.question = question
-        self.key = key
+#     def set_qa(self, question: str, key: str) -> None:
+#         self.question = question
+#         self.key = key
 
-class ReactReflectAgent(ReactAgent):
-    def __init__(self,
-                 question: str,
-                 key: str,
-                 max_steps: int = 6,
-                 agent_prompt: PromptTemplate = react_reflect_agent_prompt,
-                 reflect_prompt: PromptTemplate = reflect_prompt,
-                 docstore: Docstore = Wikipedia(),
-                 react_llm: AnyOpenAILLM = AnyOpenAILLM(
-                                             temperature=0,
-                                             max_tokens=100,
-                                             model_name="gpt-3.5-turbo",
-                                             model_kwargs={"stop": "\n"},
-                                             openai_api_key=os.environ['OPENAI_API_KEY']),
-                 reflect_llm: AnyOpenAILLM = AnyOpenAILLM(
-                                               temperature=0,
-                                               max_tokens=250,
-                                               model_name="gpt-3.5-turbo",
-                                               openai_api_key=os.environ['OPENAI_API_KEY']),
-                 ) -> None:
+# class ReactReflectAgent(ReactAgent):
+#     def __init__(self,
+#                  question: str,
+#                  key: str,
+#                  max_steps: int = 6,
+#                  agent_prompt: PromptTemplate = react_reflect_agent_prompt,
+#                  reflect_prompt: PromptTemplate = reflect_prompt,
+#                  docstore: Docstore = Wikipedia(),
+#                  react_llm: AnyOpenAILLM = AnyOpenAILLM(
+#                                              temperature=0,
+#                                              max_tokens=100,
+#                                              model_name="gpt-3.5-turbo",
+#                                              model_kwargs={"stop": "\n"},
+#                                              openai_api_key=os.environ['OPENAI_API_KEY']),
+#                  reflect_llm: AnyOpenAILLM = AnyOpenAILLM(
+#                                                temperature=0,
+#                                                max_tokens=250,
+#                                                model_name="gpt-3.5-turbo",
+#                                                openai_api_key=os.environ['OPENAI_API_KEY']),
+#                  ) -> None:
         
-        super().__init__(question, key, max_steps, agent_prompt, docstore, react_llm)
-        self.reflect_llm = reflect_llm
-        self.reflect_prompt = reflect_prompt
-        self.reflect_examples = REFLECTIONS
-        self.reflections: List[str] = []
-        self.reflections_str: str = ''
+#         super().__init__(question, key, max_steps, agent_prompt, docstore, react_llm)
+#         self.reflect_llm = reflect_llm
+#         self.reflect_prompt = reflect_prompt
+#         self.reflect_examples = REFLECTIONS
+#         self.reflections: List[str] = []
+#         self.reflections_str: str = ''
     
-    def run(self, reset = True, reflect_strategy: ReflexionStrategy = ReflexionStrategy.REFLEXION) -> None:
-        if (self.is_finished() or self.is_halted()) and not self.is_correct():
-            self.reflect(reflect_strategy)
+#     def run(self, reset = True, reflect_strategy: ReflexionStrategy = ReflexionStrategy.REFLEXION) -> None:
+#         if (self.is_finished() or self.is_halted()) and not self.is_correct():
+#             self.reflect(reflect_strategy)
 
-        ReactAgent.run(self, reset)
+#         ReactAgent.run(self, reset)
     
-    def reflect(self,
-                strategy: ReflexionStrategy) -> None:
-        print('Reflecting...')
-        if strategy == ReflexionStrategy.LAST_ATTEMPT:
-            self.reflections = [self.scratchpad]
-            self.reflections_str = format_last_attempt(self.question, self.reflections[0])
-        elif strategy == ReflexionStrategy.REFLEXION: 
-            self.reflections += [self.prompt_reflection()]
-            self.reflections_str = format_reflections(self.reflections)
-        elif strategy == ReflexionStrategy.LAST_ATTEMPT_AND_REFLEXION: 
-            self.reflections_str = format_last_attempt(self.question, self.scratchpad)
-            self.reflections = [self.prompt_reflection()]
-            self.reflections_str += format_reflections(self.reflections, header = REFLECTION_AFTER_LAST_TRIAL_HEADER)
-        else:
-            raise NotImplementedError(f'Unknown reflection strategy: {strategy}')
-        print(self.reflections_str)
+#     def reflect(self,
+#                 strategy: ReflexionStrategy) -> None:
+#         print('Reflecting...')
+#         if strategy == ReflexionStrategy.LAST_ATTEMPT:
+#             self.reflections = [self.scratchpad]
+#             self.reflections_str = format_last_attempt(self.question, self.reflections[0])
+#         elif strategy == ReflexionStrategy.REFLEXION: 
+#             self.reflections += [self.prompt_reflection()]
+#             self.reflections_str = format_reflections(self.reflections)
+#         elif strategy == ReflexionStrategy.LAST_ATTEMPT_AND_REFLEXION: 
+#             self.reflections_str = format_last_attempt(self.question, self.scratchpad)
+#             self.reflections = [self.prompt_reflection()]
+#             self.reflections_str += format_reflections(self.reflections, header = REFLECTION_AFTER_LAST_TRIAL_HEADER)
+#         else:
+#             raise NotImplementedError(f'Unknown reflection strategy: {strategy}')
+#         print(self.reflections_str)
     
-    def prompt_reflection(self) -> str:
-        return format_step(self.reflect_llm(self._build_reflection_prompt()))
+#     def prompt_reflection(self) -> str:
+#         return format_step(self.reflect_llm(self._build_reflection_prompt()))
 
 
-    def _build_reflection_prompt(self) -> str:
-        return self.reflect_prompt.format(
-                            examples = self.reflect_examples,
-                            question = self.question,
-                            scratchpad = truncate_scratchpad(self.scratchpad, tokenizer=self.enc))
+#     def _build_reflection_prompt(self) -> str:
+#         return self.reflect_prompt.format(
+#                             examples = self.reflect_examples,
+#                             question = self.question,
+#                             scratchpad = truncate_scratchpad(self.scratchpad, tokenizer=self.enc))
  
-    def _build_agent_prompt(self) -> str:
-        return self.agent_prompt.format(
-                            examples = self.react_examples,
-                            reflections = self.reflections_str,
-                            question = self.question,
-                            scratchpad = self.scratchpad)
+#     def _build_agent_prompt(self) -> str:
+#         return self.agent_prompt.format(
+#                             examples = self.react_examples,
+#                             reflections = self.reflections_str,
+#                             question = self.question,
+#                             scratchpad = self.scratchpad)
    
 
 ### String Stuff ###
@@ -359,7 +382,7 @@ def parse_action(string):
         return action_type, argument
     
     else:
-        return None
+        return 'None', string
 
 def format_step(step: str) -> str:
     # TODO: format的影响？
@@ -371,12 +394,14 @@ def format_reflections(reflections: List[str],
     if reflections == []:
         return ''
     else:
-        return header + 'Reflections:\n- ' + '\n- '.join([r.strip() for r in reflections])
+        # return header + 'Reflections:\n- ' + '\n- '.join([r.strip() for r in reflections])
+        return header + '反思:\n- ' + '\n- '.join([r.strip() for r in reflections])
 
 def format_last_attempt(question: str,
                         scratchpad: str,
                         header: str = LAST_TRIAL_HEADER):
-    return header + f'Question: {question}\n' + truncate_scratchpad(scratchpad, tokenizer=gpt2_enc).strip('\n').strip() + '\n(END PREVIOUS TRIAL)\n'
+    # return header + f'Question: {question}\n' + truncate_scratchpad(scratchpad, tokenizer=gpt2_enc).strip('\n').strip() + '\n(END PREVIOUS TRIAL)\n'
+     return header + f'问题: {question}\n' + truncate_scratchpad(scratchpad, tokenizer=gpt2_enc).strip('\n').strip() + '\n（示例结束）\n'
 
 def truncate_scratchpad(scratchpad: str, n_tokens: int = 1600, tokenizer = gpt2_enc) -> str:
     lines = scratchpad.split('\n')

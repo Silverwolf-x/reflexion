@@ -27,13 +27,12 @@ def process_answer(answer):
         if len(answer)==1: return answer[0]
         else: return '+'.join(answer)
     else: print(answer)
-# Q =  "请使用你的已有知识，判断该病人是以下这7个病中的哪一种或多种疾病。脂肪肝，药物性肝损伤，原发性肝癌，酒精性肝病，自身免疫性肝炎，肝囊肿，肝血管瘤。如果病人是多种疾病，用'+'号连接。以下回答都是正确格式：Finish[脂肪肝]。Finish[脂肪肝+药物性肝损伤]。Finish[药物性肝损伤+脂肪肝+自身免疫性肝炎]。"
+
 Q =  "请基于你的医学专业知识，诊断该病人的病因，这是含有以下7个选项的不定项选择题：脂肪肝，药物性肝损伤，原发性肝癌，酒精性肝病，自身免疫性肝炎，肝囊肿，肝血管瘤。如果病人是多种疾病，用'+'号连接。"
 for ind, row in med.iterrows():
     raw_q = row['question']
     context = raw_q.replace('请判断该病人是以下哪种疾病。病人检查如下：','') # 反整理出病情context
     med.at[ind,'context'] = context 
-    # TODO:对齐195，199的evidence的提取
     med.at[ind,'QAonly'] = Q+'||'+context
     med.at[ind,'Q'] = Q
     med.at[ind,'process_answer'] = process_answer(row['answer'])
@@ -53,7 +52,7 @@ strategy: ReflexionStrategy = ReflexionStrategy.LAST_ATTEMPT_AND_REFLEXION
 from promptsmed import cot_agent_prompt, cot_reflect_agent_prompt, cot_reflect_prompt
 from fewshotsmed import MED_COT, MED_COT_REFLECT
 # 运行1例
-med = med.iloc[0:1]
+med = med.iloc[1:6]
 
 agents = [CoTAgent(row['Q'],
                    row['context'],
@@ -70,12 +69,16 @@ n = 1 # 重复运行N次流程，相当于N次独立项目运行，并不每个�
 trial = 0
 log = ''
 
+from agents import get_model_name
+
+get_model_name()
 for i in range(n):
     for agent in [a for a in agents if not a.is_correct()]:
         print(f'Question Context: {agent.context[:50]}...')
         agent.run(reflexion_strategy = strategy)
         print(f'Answer: {agent.key}')
     trial += 1
+    log += get_model_name() + r'\n'
     log += log_trial(agents, trial)
     correct, incorrect = summarize_trial(agents)
     print(f'Finished Trial {trial}, Correct: {len(correct)}, Incorrect: {len(incorrect)}')
