@@ -44,13 +44,13 @@ class CoTAgent:
                     reflect_examples: str = COT_REFLECT,
                     self_reflect_llm: AnyOpenAILLM = AnyOpenAILLM(
                                             temperature=0,
-                                            max_tokens=250,
+                                            # max_tokens=250,
                                             model_name="gpt-3.5-turbo",
                                             model_kwargs={"stop": "\n"},
                                             openai_api_key=os.environ['OPENAI_API_KEY']),
                     action_llm: AnyOpenAILLM = AnyOpenAILLM(
                                             temperature=0,
-                                            max_tokens=250,
+                                            # max_tokens=250,
                                             model_name="gpt-3.5-turbo",
                                             model_kwargs={"stop": "\n"},
                                             openai_api_key=os.environ['OPENAI_API_KEY']),
@@ -363,8 +363,8 @@ def parse_action(string):
 
 def format_step(step: str) -> str:
     # TODO: format的影响？
-    return step
-    # return step.strip('\n').strip().replace('\n', '')
+    # return step
+    return step.strip('\n').strip().replace('\n', '')
 
 def format_reflections(reflections: List[str],
                         header: str = REFLECTION_HEADER) -> str:

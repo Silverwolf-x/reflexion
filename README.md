@@ -36,7 +36,11 @@ TypeError: cannot unpack non-iterable NoneType object
 结束时有TypeError: cannot pickle 'builtins.CoreBPE' object。如果list包裹住agents时。
 
 ## LOG
-- 20240821:
-中文化，解决log记录问题。并相对成功输出本地化log。见med_context_0821_2205_1_questions_5_trials.txt
+### 20240821
+- 中文化，解决log记录问题。并相对成功输出本地化log。见med_context_0821_2205_1_questions_5_trials.txt
 
-TODO: 直接把prompt放入ollama和reflexion中的输出不一致，reflexion输出比ollama原生输出少太多。见test_ollama_api.py
+> TODO: 直接把prompt放入ollama和reflexion中的输出不一致，reflexion输出比ollama原生输出少太多。见test_ollama_api.py
+FIXED: llm.py中__call__中，将HumanMessage改为AIMessage，回答的效果有大量的提升。
+
+- 调用mymedQA_context.py中n = 1 # 重复运行N次流程，相当于N次独立项目运行，并不每个案例N次反思
+- 修改了log输出的目录地址

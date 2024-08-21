@@ -66,13 +66,13 @@ agents = [CoTAgent(row['Q'],
 
 # #### Run `n` trials
 
-n = 5 # 重复运行N次流程，相当于N次独立项目运行，并不每个案例N次反思
+n = 1 # 重复运行N次流程，相当于N次独立项目运行，并不每个案例N次反思
 trial = 0
 log = ''
 
 for i in range(n):
     for agent in [a for a in agents if not a.is_correct()]:
-        print(f'Question Number: {agent.question}')
+        print(f'Question Context: {agent.context[:50]}...')
         agent.run(reflexion_strategy = strategy)
         print(f'Answer: {agent.key}')
     trial += 1
@@ -82,7 +82,7 @@ for i in range(n):
 
 import time
 formatted_time = time.strftime("%m%d_%H%M", time.localtime())
-with open(os.path.join(root, 'CoT', 'context', strategy.value, f'med_context_{formatted_time}_{len(agents)}_questions_{trial}_trials.txt'), 'w') as f:
+with open(os.path.join(root, f'CoT_context_{strategy.value}', f'med_context_{formatted_time}_{len(agents)}_questions_{trial}_trials.txt'), 'w') as f:
     f.write(log)
 save_agents(agents, os.path.join(root, 'CoT', 'context', strategy.value, 'agents'))
 

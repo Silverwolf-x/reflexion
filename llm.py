@@ -2,7 +2,7 @@ from typing import Union, Literal
 from langchain.chat_models import ChatOpenAI
 from langchain import OpenAI
 from langchain.schema import (
-    HumanMessage
+    HumanMessage,AIMessage,BaseMessage
 )
 import os
 import subprocess
@@ -17,13 +17,7 @@ class AnyOpenAILLM:
         # Determine model type from the kwargs
         # model_name = kwargs.get('model_name', 'gpt-3.5-turbo') 
         kwargs['model_name'] = 'qwen2'
-        # if kwargs['model_name'].split('-')[0] == 'text':
-        #     self.model = OpenAI(*args, **kwargs)
-        #     self.model_type = 'completion'
-        # else:
-        #     self.model = ChatOpenAI(*args, **kwargs)
-        #     self.model_type = 'chat'
-
+        
         self.model = ChatOpenAI(*args, **kwargs)
         self.model_type = 'chat'
 
@@ -41,10 +35,7 @@ class AnyOpenAILLM:
         if self.model_type == 'completion':
             return self.model(prompt)
         else:
-            return self.model(
-                [
-                    HumanMessage(
-                        content=prompt,
-                    )
-                ]
+            return self.model([
+            # HumanMessage(content=prompt,)]
+            AIMessage(content=prompt,)]
             ).content
