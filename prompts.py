@@ -110,9 +110,12 @@ Here are some examples:
 
 Question: {question}{scratchpad}"""
 
-REFLECTION_HEADER = 'You have attempted to answer following question before and failed. The following reflection(s) give a plan to avoid failing to answer the question in the same way you did previously. Use them to improve your strategy of correctly answering the given question.\n'
-REFLECTION_AFTER_LAST_TRIAL_HEADER = 'The following reflection(s) give a plan to avoid failing to answer the question in the same way you did previously. Use them to improve your strategy of correctly answering the given question.\n'
-LAST_TRIAL_HEADER = 'You have attempted to answer the following question before and failed. Below is the last trial you attempted to answer the question.\n'
+# REFLECTION_HEADER = 'You have attempted to answer following question before and failed. The following reflection(s) give a plan to avoid failing to answer the question in the same way you did previously. Use them to improve your strategy of correctly answering the given question.\n'
+# REFLECTION_AFTER_LAST_TRIAL_HEADER = 'The following reflection(s) give a plan to avoid failing to answer the question in the same way you did previously. Use them to improve your strategy of correctly answering the given question.\n'
+# LAST_TRIAL_HEADER = 'You have attempted to answer the following question before and failed. Below is the last trial you attempted to answer the question.\n'
+REFLECTION_HEADER = '您之前曾尝试回答以下问题，但失败了。以下反思给出了一个计划，以避免无法以与之前相同的方式回答问题。使用它们来改进您正确回答给定问题的策略。\n'
+REFLECTION_AFTER_LAST_TRIAL_HEADER = '以下反思给出了一个计划，以避免无法以与之前相同的方式回答问题。使用它们来改进您正确回答给定问题的策略。\n'
+LAST_TRIAL_HEADER = '您之前曾尝试回答以下问题，但失败了。以下是您最后一次尝试回答该问题的尝试。\n'
 
 REFLECT_INSTRUCTION = """You are an advanced reasoning agent that can improve based on self refection. You will be given a previous reasoning trial in which you were given access to an Docstore API environment and a question to answer. You were unsuccessful in answering the question either because you guessed the wrong answer with Finish[<answer>], or you used up your set number of reasoning steps. In a few sentences, Diagnose a possible reason for failure and devise a new, concise, high level plan that aims to mitigate the same failure. Use complete sentences.  
 Here are some examples:

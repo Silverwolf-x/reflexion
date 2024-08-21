@@ -80,35 +80,36 @@ class CoTAgent:
 
     def step(self) -> None:
         # Think
-        self.scratchpad += f'\nThought:'
+        self.scratchpad += f'\n思考:'
         self.scratchpad += ' ' + self.prompt_agent()
         print(self.scratchpad.split('\n')[-1])
 
         # Act
-        self.scratchpad += f'\nAction:'
+        self.scratchpad += f'\n行动:'
         action = self.prompt_agent()
         self.scratchpad += ' ' + action
         if parse_action(action) is not None:
             action_type, argument = parse_action(action)
         else:
-            self.scratchpad += 'Invalid Action. Valid Actions are Lookup[<topic>] Search[<topic>] and Finish[<answer>].'
+            # 'Invalid Action. Valid Actions are Lookup[<topic>] Search[<topic>] and Finish[<answer>].'
+            self.scratchpad += '无效行动。有效行动只有完成[<答案>]、分析[<思考>]'
             print(self.scratchpad.split('\n')[-1])
             self.step_n += 1
             return
         # action_type, argument = parse_action(action)
         print(self.scratchpad.split('\n')[-1])  
 
-        self.scratchpad += f'\nObservation: '
-        if action_type == 'Finish':
+        self.scratchpad += f'\n观察: '
+        if action_type == '完成':
             self.answer = argument
             if self.is_correct():
-                self.scratchpad += 'Answer is CORRECT'
+                self.scratchpad += '回答正确'
             else: 
-                self.scratchpad += 'Answer is INCORRECT'
+                self.scratchpad += '回答错误'
             self.finished = True
             return
         else:
-            self.scratchpad += 'Invalid Action. Valid Actions are Lookup[<topic>] Search[<topic>] and Finish[<answer>].'
+            self.scratchpad += '无效行动。有效行动只有完成[<答案>]、分析[<思考>]'
             print('Invalid action type, please try again.')
     
     def reflect(self,
@@ -361,7 +362,9 @@ def parse_action(string):
         return None
 
 def format_step(step: str) -> str:
-    return step.strip('\n').strip().replace('\n', '')
+    # TODO: format的影响？
+    return step
+    # return step.strip('\n').strip().replace('\n', '')
 
 def format_reflections(reflections: List[str],
                         header: str = REFLECTION_HEADER) -> str:

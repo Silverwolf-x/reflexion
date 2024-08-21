@@ -34,3 +34,9 @@ TypeError: cannot unpack non-iterable NoneType object
 同样应用于COT
 
 结束时有TypeError: cannot pickle 'builtins.CoreBPE' object。如果list包裹住agents时。
+
+## LOG
+- 20240821:
+中文化，解决log记录问题。并相对成功输出本地化log。见med_context_0821_2205_1_questions_5_trials.txt
+
+TODO: 直接把prompt放入ollama和reflexion中的输出不一致，reflexion输出比ollama原生输出少太多。见test_ollama_api.py
