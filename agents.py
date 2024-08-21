@@ -31,18 +31,6 @@ class ReflexionStrategy(Enum):
     LAST_ATTEMPT = 'last_trial' 
     REFLEXION = 'reflexion'
     LAST_ATTEMPT_AND_REFLEXION = 'last_trial_and_reflexion'
-def get_model_name():
-    import subprocess,json
-    try: 
-        command = ['ollama', 'serve']
-        command = ['curl', 'http://localhost:11434/api/ps']
-        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        json_data = json.loads(result.stdout)
-        mn = f"Model: {json_data['models'][0]['name']}\tParameter: {json_data['models'][0]['details']['parameter_size']}"
-        print(mn)
-        return mn
-    except Exception as e:
-        print(e)
 
 class CoTAgent:
     def __init__(self,
@@ -96,8 +84,12 @@ class CoTAgent:
         print(self.scratchpad.split('\n')[-1])
 
         # Act
+        def extract_last_phrase(text):
+            # 使用正则表达式查找所有用双星号括起来的短语,匹配qwen的输出惯例
+            matches = re.findall(r'\*\*(.*?)\*\*', text)
+            return matches[-1] if matches else None
         self.scratchpad += f'\n行动:'
-        action = self.prompt_agent()
+        action = f'完成[{extract_last_phrase(self.prompt_agent())}]'
         self.scratchpad += ' ' + action
         if parse_action(action) is not None:
             action_type, argument = parse_action(action)
@@ -380,7 +372,6 @@ def parse_action(string):
         action_type = match.group(1)
         argument = match.group(2)
         return action_type, argument
-    
     else:
         return 'None', string
 

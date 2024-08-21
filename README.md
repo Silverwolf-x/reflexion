@@ -44,3 +44,9 @@ FIXED: llm.py中__call__中，将HumanMessage改为AIMessage，回答的效果�
 
 - 调用mymedQA_context.py中n = 1 # 重复运行N次流程，相当于N次独立项目运行，并不每个案例N次反思
 - 修改了log输出的目录地址
+
+### 20240821v2
+发布dev-cn-llm分支,对llm.py中的垃圾langchain调用,用原生ollama直接调用,回答质量有了质的飞跃
+TODO: prompt控制力度需要加强,如何调教出"最后一句话必须按照这个格式回答"并且能够正则识别出来是个问题
+方向:改用字母 如AB
+TODO2: incorrect时候无法触发reflexion机制
