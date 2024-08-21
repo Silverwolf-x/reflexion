@@ -16,13 +16,16 @@ class AnyOpenAILLM:
         global flag
         # Determine model type from the kwargs
         # model_name = kwargs.get('model_name', 'gpt-3.5-turbo') 
-        kwargs['model_name'] = 'medllama2'
-        if kwargs['model_name'].split('-')[0] == 'text':
-            self.model = OpenAI(*args, **kwargs)
-            self.model_type = 'completion'
-        else:
-            self.model = ChatOpenAI(*args, **kwargs)
-            self.model_type = 'chat'
+        kwargs['model_name'] = 'qwen2'
+        # if kwargs['model_name'].split('-')[0] == 'text':
+        #     self.model = OpenAI(*args, **kwargs)
+        #     self.model_type = 'completion'
+        # else:
+        #     self.model = ChatOpenAI(*args, **kwargs)
+        #     self.model_type = 'chat'
+
+        self.model = ChatOpenAI(*args, **kwargs)
+        self.model_type = 'chat'
 
         # #### 展示正在使用的ollama模型信息
         # TODO: 不要在llm.py设定模型，这不优雅
