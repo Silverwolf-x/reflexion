@@ -28,7 +28,7 @@ def process_answer(answer):
         else: return '+'.join(answer)
     else: print(answer)
 # Q =  "请使用你的已有知识，判断该病人是以下这7个病中的哪一种或多种疾病。脂肪肝，药物性肝损伤，原发性肝癌，酒精性肝病，自身免疫性肝炎，肝囊肿，肝血管瘤。如果病人是多种疾病，用'+'号连接。以下回答都是正确格式：Finish[脂肪肝]。Finish[脂肪肝+药物性肝损伤]。Finish[药物性肝损伤+脂肪肝+自身免疫性肝炎]。"
-Q =  "请全程使用中文进行回答。请使用你的已有知识，判断该病人是以下这7个病中的哪一种或多种疾病。脂肪肝，药物性肝损伤，原发性肝癌，酒精性肝病，自身免疫性肝炎，肝囊肿，肝血管瘤。如果病人是多种疾病，用'+'号连接。"
+Q =  "请基于你的专业知识，判断该病人是以下这7个病中的哪一种或多种疾病。脂肪肝，药物性肝损伤，原发性肝癌，酒精性肝病，自身免疫性肝炎，肝囊肿，肝血管瘤。如果病人是多种疾病，用'+'号连接。"
 for ind, row in med.iterrows():
     raw_q = row['question']
     context = raw_q.replace('请判断该病人是以下哪种疾病。病人检查如下：','') # 反整理出病情context
@@ -48,8 +48,9 @@ strategy: ReflexionStrategy = ReflexionStrategy.LAST_ATTEMPT_AND_REFLEXION
 
 # #### Initialize a CoTAgent for each question
 
-from prompts import cot_agent_prompt, cot_reflect_agent_prompt, cot_reflect_prompt
+# from prompts import cot_agent_prompt, cot_reflect_agent_prompt, cot_reflect_prompt
 # from fewshots import COT, COT_REFLECT
+from promptsmed import cot_agent_prompt, cot_reflect_agent_prompt, cot_reflect_prompt
 from fewshotsmed import MED_COT, MED_COT_REFLECT
 # 运行1例
 med = med.iloc[0:1]
