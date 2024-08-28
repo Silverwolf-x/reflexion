@@ -50,3 +50,5 @@ FIXED: llm.py中__call__中，将HumanMessage改为AIMessage，回答的效果�
 TODO: prompt控制力度需要加强,如何调教出"最后一句话必须按照这个格式回答"并且能够正则识别出来是个问题
 方向:改用字母 如AB
 TODO2: incorrect时候无法触发reflexion机制
+
+- 输出的正则过滤在agents.py中，CoTAgent类extract_last_phrase函数下
