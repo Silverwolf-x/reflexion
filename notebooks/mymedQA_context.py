@@ -42,17 +42,19 @@ for ind, row in med.iterrows():
 print(ReflexionStrategy.__doc__)
 
 
-# strategy: ReflexionStrategy = ReflexionStrategy.REFLEXION
-strategy: ReflexionStrategy = ReflexionStrategy.LAST_ATTEMPT_AND_REFLEXION
+strategy: ReflexionStrategy = ReflexionStrategy.REFLEXION
+# strategy: ReflexionStrategy = ReflexionStrategy.LAST_ATTEMPT_AND_REFLEXION
 
 # #### Initialize a CoTAgent for each question
 
 # from prompts import cot_agent_prompt, cot_reflect_agent_prompt, cot_reflect_prompt
 # from fewshots import COT, COT_REFLECT
 from promptsmed import cot_agent_prompt, cot_reflect_agent_prompt, cot_reflect_prompt
-from fewshotsmed import MED_COT, MED_COT_REFLECT
+# from fewshotsmed import MED_COT, MED_COT_REFLECT
+from fewshotsmed_0829 import MED_COT_0829, MED_COT_REFLECT_0829 as MED_COT, MED_COT_REFLECT
 # 运行1例
-med = med.iloc[0:6]
+run_examples = 2
+med = med.iloc[0:run_examples]
 
 agents = [CoTAgent(row['Q'],
                    row['context'],
@@ -66,9 +68,8 @@ agents = [CoTAgent(row['Q'],
 
 # #### Run `n` trials
 
-n = 1 # 重复运行N次流程，相当于N次独立项目运行，并不每个案例N次反思
-trial = 5
-log = ''
+n = 5 # 代表最大反思次数
+trial ,log = 0,''
 
 import ollama
 for i in range(n):
@@ -84,7 +85,11 @@ for i in range(n):
 
 import time
 formatted_time = time.strftime("%m%d_%H%M", time.localtime())
-with open(os.path.join(root, f'CoT_context_{strategy.value}', f'med_context_{formatted_time}_{len(agents)}_questions_{trial}_trials.txt'), 'w') as f:
+folder_name = f'CoT_context_{strategy.value}'
+
+if not os.path.exists(os.path.join(root, folder_name)):
+    os.makedirs(os.path.join(root, folder_name))
+with open(os.path.join(root, folder_name, f'med_context_{formatted_time}_{len(agents)}_questions_{trial}_trials.txt'), 'w') as f:
     f.write(log)
 # save_agents(agents, os.path.join(root, 'CoT', 'context', strategy.value, 'agents'))
 

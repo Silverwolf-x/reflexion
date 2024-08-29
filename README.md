@@ -52,3 +52,13 @@ TODO: prompt控制力度需要加强,如何调教出"最后一句话必须按照
 TODO2: incorrect时候无法触发reflexion机制
 
 - 输出的正则过滤在agents.py中，CoTAgent类extract_last_phrase函数下
+
+### 20240829
+更新外来的fewshotsmed_0829
+
+- 有反思机制，名称为trial，最大反思次数为n
+- 流程如下：
+LLM输入的文字由以下及部分组成：fewshots.py的例子+套prompts.py格式的问题输入+agents.py零散的连接词。
+LLM输出会经过agents.py的parse_action()函数截取Action，通过Action和Answer判断对错
+之后，全部运行完一轮trial后，如果回答错误，第二轮时就会进入reflexion，重复reflextion，直至回答正确或者达到上限次数n
+TODO: LAST_ATTEMPT_AND_REFLEXION的修复--> LAST_ATTEMPT无法截取到内容
